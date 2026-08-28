@@ -1,0 +1,9 @@
+{
+  "appId": "com.simplebusiness.blastgrid",
+  "appName": "Blast Grid",
+  "webDir": "dist",
+  "backgroundColor": "#070a12",
+  "android": {
+    "allowMixedContent": false
+  }
+}

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#090d18" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>Blast Grid</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main id="app">
+    <canvas id="game" width="960" height="540" aria-label="Blast Grid game arena"></canvas>
+
+    <header id="hud" class="hidden">
+      <div class="hud-chip"><span>WORLD</span><strong id="hudWorld">1-1</strong></div>
+      <div class="hud-chip"><span>SCORE</span><strong id="hudScore">0</strong></div>
+      <div class="hud-chip"><span>LIVES</span><strong id="hudLives">3</strong></div>
+      <div class="hud-chip"><span>BOMBS</span><strong id="hudBombs">1</strong></div>
+      <div class="hud-chip"><span>BLAST</span><strong id="hudRange">2</strong></div>
+      <button id="pauseBtn" class="icon-btn" aria-label="Pause">Ⅱ</button>
+    </header>
+
+    <section id="menu" class="overlay">
+      <div class="panel hero-panel">
+        <p class="eyebrow">ORIGINAL MOBILE GRID ACTION</p>
+        <h1>BLAST<br><em>GRID</em></h1>
+        <p class="subtitle">Plant. Chain. Escape. Thirty stages of fast maze-bomb combat.</p>
+        <div class="menu-actions">
+          <button id="newGameBtn" class="primary">NEW RUN</button>
+          <button id="continueBtn" class="secondary">CONTINUE</button>
+        </div>
+        <button id="howBtn" class="text-btn">HOW TO PLAY</button>
+        <p class="legal-note">Original game code, characters, stages, visuals and sound design.</p>
+      </div>
+    </section>
+
+    <section id="modal" class="overlay hidden" aria-live="polite">
+      <div class="panel modal-panel">
+        <p id="modalEyebrow" class="eyebrow"></p>
+        <h2 id="modalTitle"></h2>
+        <p id="modalBody"></p>
+        <div id="modalStats" class="modal-stats"></div>
+        <div id="modalActions" class="menu-actions"></div>
+      </div>
+    </section>
+
+    <section id="controls" class="hidden" aria-label="Touch controls">
+      <div id="dpad" class="dpad">
+        <button class="dir up" data-dir="up" aria-label="Move up">▲</button>
+        <button class="dir left" data-dir="left" aria-label="Move left">◀</button>
+        <div class="pad-core"></div>
+        <button class="dir right" data-dir="right" aria-label="Move right">▶</button>
+        <button class="dir down" data-dir="down" aria-label="Move down">▼</button>
+      </div>
+      <div class="action-cluster">
+        <button id="modeBtn" class="small-action"><span>TYPE</span><strong id="modeLabel">FUSE</strong></button>
+        <button id="abilityBtn" class="small-action"><span>ACTION</span><strong>TRIGGER</strong></button>
+        <button id="bombBtn" class="bomb-action" aria-label="Place bomb"><span>DROP</span><strong>●</strong></button>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="src/game.js"></script>
+</body>
+</html>
