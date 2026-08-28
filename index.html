@@ -47,10 +47,10 @@
     </section>
 
     <section id="controls" class="hidden" aria-label="Touch controls">
-      <div id="dpad" class="dpad">
+      <div id="dpad" class="dpad" aria-label="Directional pad. Hold and slide your thumb to steer.">
         <button class="dir up" data-dir="up" aria-label="Move up">▲</button>
         <button class="dir left" data-dir="left" aria-label="Move left">◀</button>
-        <div class="pad-core"></div>
+        <div class="pad-core" aria-hidden="true"></div>
         <button class="dir right" data-dir="right" aria-label="Move right">▶</button>
         <button class="dir down" data-dir="down" aria-label="Move down">▼</button>
       </div>
@@ -61,6 +61,7 @@
       </div>
     </section>
   </main>
+  <script src="src/joystick-dpad.js"></script>
   <script type="module" src="src/game.js"></script>
 </body>
 </html>
