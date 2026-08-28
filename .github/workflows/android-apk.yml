@@ -1,0 +1,110 @@
+name: Build Blast Grid Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'styles.css'
+      - 'src/**'
+      - 'tests/**'
+      - 'icons/**'
+      - 'manifest.webmanifest'
+      - 'sw.js'
+      - 'package.json'
+      - 'capacitor.config.json'
+      - '.github/workflows/android-apk.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: blast-grid-android-main
+  cancel-in-progress: true
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Run game logic tests
+        run: npm test
+
+      - name: Prepare offline web bundle
+        run: |
+          rm -rf dist android
+          mkdir -p dist/src dist/icons
+          cp index.html styles.css manifest.webmanifest sw.js dist/
+          cp src/*.js dist/src/
+          cp icons/icon.svg dist/icons/
+          test -s dist/src/game.js
+          test -s dist/src/core.js
+
+      - name: Generate Android shell
+        run: npx cap add android
+
+      - name: Sync game into Android
+        run: npx cap sync android
+
+      - name: Lock Android app to landscape
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('android/app/src/main/AndroidManifest.xml')
+          s=p.read_text()
+          needle='android:name=".MainActivity"'
+          if 'android:screenOrientation="landscape"' not in s:
+              s=s.replace(needle, needle+' android:screenOrientation="landscape"')
+          p.write_text(s)
+          PY
+
+      - name: Build debug APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Verify APK
+        run: |
+          test -s android/app/build/outputs/apk/debug/app-debug.apk
+          cp android/app/build/outputs/apk/debug/app-debug.apk blast-grid-debug.apk
+          ls -lh blast-grid-debug.apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: blast-grid-debug-apk
+          path: blast-grid-debug.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish latest APK release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view android-latest >/dev/null 2>&1; then
+            gh release upload android-latest blast-grid-debug.apk --clobber
+          else
+            gh release create android-latest blast-grid-debug.apk \
+              --title "Blast Grid Android APK" \
+              --notes "Latest installable Android test build of Blast Grid."
+          fi
