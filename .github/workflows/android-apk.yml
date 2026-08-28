@@ -15,6 +15,7 @@ on:
       - 'package.json'
       - 'capacitor.config.json'
       - '.github/workflows/android-apk.yml'
+      - '.github/blast-grid-debug.keystore.b64'
 
 permissions:
   contents: write
@@ -58,6 +59,7 @@ jobs:
           cp icons/icon.svg dist/icons/
           test -s dist/src/game.js
           test -s dist/src/core.js
+          test -s dist/src/joystick-dpad.js
 
       - name: Generate Android shell
         run: npx cap add android
@@ -76,6 +78,13 @@ jobs:
               s=s.replace(needle, needle+' android:screenOrientation="landscape"')
           p.write_text(s)
           PY
+
+      - name: Install stable debug signing key
+        run: |
+          mkdir -p "$HOME/.android"
+          base64 --decode .github/blast-grid-debug.keystore.b64 > "$HOME/.android/debug.keystore"
+          echo "de25eaa3fb208abcf332df7baefe6947367cfbdc2bf5b5cd1765a7a0d08a9acd  $HOME/.android/debug.keystore" | sha256sum -c -
+          keytool -list -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey >/dev/null
 
       - name: Build debug APK
         working-directory: android
